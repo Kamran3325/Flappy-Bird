@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kamran Ve Murad</title>
+    <title>Flappy Bird</title>
     <style>
         body {
             display: flex;
-            flex-direction: column; /* Düzgün düzülmə üçün sütun düzülüşü */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -19,13 +19,13 @@
             border: 2px solid #000;
         }
         h1 {
-            font-size: 36px; /* Başlığın ölçüsü */
-            color: black; /* Başlığın rəngi */
-            margin-bottom: 20px; /* Başlıq ilə düymə arasında məsafə */
+            font-size: 36px;
+            color: black;
+            margin-bottom: 20px;
         }
         #restart, #start {
             display: none;
-            position: relative; /* Düzgün düzülmə üçün */
+            position: relative;
             padding: 10px 20px;
             font-size: 24px;
             color: black;
@@ -35,25 +35,25 @@
             cursor: pointer;
             text-align: center;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-            line-height: 1.5; /* Mətni mərkəzə gətirmək üçün */
+            line-height: 1.5;
         }
         #start {
-            display: block; /* Başla düyməsini göstər */
+            display: block;
         }
     </style>
 </head>
 <body>
-    <h1>QUŞ SƏİDİ EVƏ ÇATDIR!</h1> <!-- Başlıq əlavə edildi -->
+    <h1>QUŞ SƏİDİ EVƏ ÇATDIR!</h1>
     <canvas id="gameCanvas" width="320" height="480"></canvas>
-    <div id="start">Başla</div> 
+    <div id="start">Başla Oynamağa</div> 
     <div id="restart">Yenidən Başla</div>
-    <audio id="loseSound" src="kurtseid.mp3"></audio> <!-- Uduzma səsi -->
+    <audio id="loseSound" src="kurtseid.mp3"></audio>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const restartButton = document.getElementById('restart');
         const startButton = document.getElementById('start');
-        const loseSound = document.getElementById('loseSound'); // Uduzma səsi
+        const loseSound = document.getElementById('loseSound');
 
         // Oyun parametrləri
         let bird = { 
@@ -69,6 +69,7 @@
         let frame = 0;
         let score = 0;
         let gameOver = false;
+        let highScore = localStorage.getItem('highScore') ? parseInt(localStorage.getItem('highScore')) : 0; // Yüksək skoru yüklə
 
         // Quşu çəkmək
         function drawBird() {
@@ -110,14 +111,14 @@
 
         // Maneələri yeniləmək
         function updatePipes() {
-            if (frame % 75 === 0) {
-                const gap = 200; 
+            if (frame % 100 === 0) { // Yeni pipe yaratma dövrü
+                const gap = 170; 
                 const top = Math.random() * (canvas.height - gap - 20); 
                 const bottom = canvas.height - top - gap; 
                 pipes.push({ x: canvas.width, top, bottom, width: 40 }); 
             }
             pipes.forEach(pipe => {
-                pipe.x -= 2; 
+                pipe.x -= 2;
             });
             if (pipes.length && pipes[0].x < -pipes[0].width) {
                 pipes.shift(); 
@@ -156,11 +157,19 @@
 
                 ctx.fillStyle = 'black';
                 ctx.fillText(`Score: ${score}`, 10, 20); 
+                ctx.fillText(`Yüksək Skor: ${highScore}`, 10, 40); // Yüksək skoru göstərin
                 frame++;
             } else {
                 ctx.fillText('Oyun Bitdi!', canvas.width / 2 - 30, canvas.height / 2);
                 ctx.fillText(`Score: ${score}`, canvas.width / 2 - 30, canvas.height / 2 + 20);
                 loseSound.play(); // Uduzma səsini çal
+
+                // Ən yüksək skoru yoxlayın
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('highScore', highScore); // Yüksək skoru yadda saxla
+                }
+                
                 restartButton.style.display = 'block'; 
             }
         }
@@ -200,7 +209,7 @@
         // Oyun başladılması
         function gameLoop() {
             update(); 
-            requestAnimationFrame(gameLoop); 
+            setTimeout(gameLoop, 1000 / 60); // 60 FPS üçün dövrü tənzimləyin
         }
     </script>
 </body>
